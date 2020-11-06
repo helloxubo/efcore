@@ -1487,7 +1487,7 @@ namespace Microsoft.EntityFrameworkCore.Query
                 ss => ss.Set<Gear>().Where(g => g.HasSoulPatch && g.Weapons.Distinct().OrderBy(w => w.Id).FirstOrDefault().IsAutomatic));
         }
 
-        [ConditionalTheory(Skip = "Issue#17759")]
+        [ConditionalTheory]
         [MemberData(nameof(IsAsyncData))]
         public virtual Task Where_subquery_union_firstordefault_boolean(bool async)
         {
@@ -1495,6 +1495,30 @@ namespace Microsoft.EntityFrameworkCore.Query
                 async,
                 ss => ss.Set<Gear>().Where(
                     g => g.HasSoulPatch && g.Weapons.Union(g.Weapons).OrderBy(w => w.Id).FirstOrDefault().IsAutomatic));
+        }
+
+        [ConditionalTheory]
+        [MemberData(nameof(IsAsyncData))]
+        public virtual Task Where_subquery_join_firstordefault_boolean(bool async)
+        {
+            return AssertQuery(
+                async,
+                ss => ss.Set<Gear>().Where(
+                    g => g.HasSoulPatch && g.Weapons.Join(g.Weapons, e => e.Id, e => e.Id, (e1, e2) => e1).OrderBy(w => w.Id).FirstOrDefault().IsAutomatic));
+        }
+
+        [ConditionalTheory]
+        [MemberData(nameof(IsAsyncData))]
+        public virtual Task Where_subquery_left_join_firstordefault_boolean(bool async)
+        {
+            return AssertQuery(
+                async,
+                ss => ss.Set<Gear>().Where(
+                    g => g.HasSoulPatch
+                        && (from o in g.Weapons
+                            join i in g.Weapons on o.Id equals i.Id into grouping
+                            from i in grouping.DefaultIfEmpty()
+                            select o).OrderBy(w => w.Id).FirstOrDefault().IsAutomatic));
         }
 
         [ConditionalTheory]
