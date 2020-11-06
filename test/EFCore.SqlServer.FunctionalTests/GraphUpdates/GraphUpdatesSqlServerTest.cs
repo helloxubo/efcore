@@ -194,8 +194,7 @@ namespace Microsoft.EntityFrameworkCore
             }
         }
 
-        // TODO: ArgumentOutOfRangeException thrown for split query with owned types #23211
-        private class Owned : GraphUpdatesSqlServerTestBase<Owned.SqlServerFixture>
+        public class Owned : GraphUpdatesSqlServerTestBase<Owned.SqlServerFixture>
         {
             public Owned(SqlServerFixture fixture)
                 : base(fixture)
